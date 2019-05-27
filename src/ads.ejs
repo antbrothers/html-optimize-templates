@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <%= htmlWebpackPlugin.options.injectCriticalCss(htmlWebpackPlugin, compilation) %>
+  <title><%= htmlWebpackPlugin.options.title %></title>
+</head>
+<body>  
+    <%= require('../src/components/ads/ads.ejs')() %>
+    <%= htmlWebpackPlugin.options.injectNonCriticalCss(htmlWebpackPlugin) %>   
+</body>
+</html>
