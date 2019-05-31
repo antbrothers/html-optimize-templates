@@ -1,8 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-// var HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
-// const StyleExtHtmlWebpackPlugin = require('style-ext-html-webpack-plugin')
 var lodash = require('lodash');
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const merger = require('webpack-merge')
