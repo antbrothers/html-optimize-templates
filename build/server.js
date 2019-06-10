@@ -4,7 +4,7 @@ const webpackDevMiddleware = require('webpack-dev-middleware')
 const path = require('path')
 const fs = require("fs")
 const merge = require('webpack-merge')
-
+const analysis = require('./analysis')
 const app = express()
 const config = process.argv[2] == 'development' ? require('./webpack.dev.config') : require('./webpack.pro.config')
 const compiler = webpack(config)
@@ -68,7 +68,11 @@ app.use('/get', express.Router().get('/menu', function (req, res, next) {
     var _pages = walk(pageDir)    
     res.send({ compoents: _compoents, pages: _pages })
 }))
-
+// 解析静态资源
+app.use('/', express.Router().get('/dinamic', function (req, res, next) { 
+    console.log('进入')
+    analysis(req, res)
+}))
 
 // 配置路由 解析 html
 // 如果要匹配更加复杂的路由，可以使用正则
@@ -96,6 +100,7 @@ app.get('/:page?', function (req, res, next) {
         res.end();
     })
 })
+
 app.listen(3001, function () {
     console.log('服务器已开启端口: 3001!\n');
 })

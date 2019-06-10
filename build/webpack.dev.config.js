@@ -74,7 +74,7 @@ const htmlConfig = () => {
                             .filter(jsFilename => /^js\b/.test(jsFilename))   
                             .map(jsFilename => p.push(jsFilename))
                             .join('\n');
-                        return `<script type="text/javascript" src="??${p.join(',')}"></script>`
+                        return `<script type="text/javascript" src="/dinamic/??${p.join(',')}"></script>`
                     },
                 })               
             )
