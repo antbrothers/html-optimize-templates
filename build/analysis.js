@@ -3,14 +3,14 @@
  * @Desc: 解析静态资源路径
  * @Date: 2019-06-10 11:35:04 
  * @Last Modified by: linjianx
- * @Last Modified time: 2019-06-10 14:58:33
+ * @Last Modified time: 2019-06-12 11:13:56
  */
 const fs = require("fs")
 const path = require('path')
 var MIME = {
-  '.css': 'text/css',
-  '.js': 'application/javascript',
-  '.html': 'text/html'
+    '.css': 'text/css',
+    '.js': 'application/javascript',
+    '.html': 'text/html'
 };
 /**
  * Desc : 此处为串读取文件，当请求的文件多，需要合并的数据也比较大时，会拖慢服务器的消耗时间
@@ -19,65 +19,76 @@ var MIME = {
  * @param {*} pathnames 
  * @param {*} callback 
  */
-function combineFiles(pathnames, callback) {
-  var output = [];
-  (function next(i, len) {
-      if (i < len) {
-          fs.readFile(pathnames[i], function (err, data) {
-              if (err) {
-                  callback(err);
-              } else {
-                  output.push(data);
-                  next(i + 1, len);
-              }
-          });
-      } else {
-          const data = Buffer.concat(output);
-          console.log(data);
+function combineFiles(pathnames, callback, compiler) {
+    var output = [];
+    (function next(i, len) {
+        if (i < len) {
+            if (process.argv[2] == 'development') {
+                compiler.outputFileSystem.readFile(pathnames[i], function (err, result) {
+                    if (err) {
+                        callback(err);
+                    } else {
+                        output.push(result);
+                        next(i + 1, len);
+                    }
+                })
+            } else {
+                fs.readFile(pathnames[i], function (err, data) {
+                    if (err) {
+                        callback(err);
+                    } else {
+                        output.push(data);
+                        next(i + 1, len);
+                    }
+                });
+            }
 
-          callback(null, data);
-      }
-  }(0, pathnames.length));
+        } else {
+            const data = Buffer.concat(output);
+            console.log(data);
+
+            callback(null, data);
+        }
+    }(0, pathnames.length));
 }
 // 解析文件路径
-function parseURL (root, url) {
-  console.log('输出路径')
-  console.log(url)
-  var base, pathnames, parts;
+function parseURL(root, url) {
+    var base, pathnames, parts;
 
-  if (url.indexOf('??') === -1) {
-      url = url.replace('/', '/??');
-  }
+    if (url.indexOf('??') === -1) {
+        url = url.replace('/', '/??');
+    }
 
-  parts = url.split('??');
-  // base = parts[0];
-  base = '../dist/'
-  if (parts[1].indexOf(',') === -1) {
-      pathnames = path.join(root, base, parts[1])       
-  }
-  pathnames = parts[1].split(',').map(function(value) {
-      var filePath = path.join(root, base, value);
-      return filePath;
-  });
-  return {
-      mime: MIME[path.extname(pathnames[0])] || 'text/plain',
-      pathnames: pathnames
-  };
+    parts = url.split('??');
+    // base = parts[0];
+    base = '../dist/'
+    if (parts[1].indexOf(',') === -1) {
+        pathnames = path.join(root, base, parts[1])
+    }
+    pathnames = parts[1].split(',').map(function (value) {
+        var filePath = path.join(root, base, value);
+        return filePath;
+    });
+    return {
+        mime: MIME[path.extname(pathnames[0])] || 'text/plain',
+        pathnames: pathnames
+    };
 }
 
-function main (request, response) {
-  var urlInfo = parseURL(__dirname, request.url)
-  console.log(urlInfo)
-  combineFiles(urlInfo.pathnames, function(err, data) {
-    if (err) {
-      response.writeHead(404);
-      response.end(err.message);
-    } else {
-      response.writeHead(200, {
-        'Content-Type': urlInfo.mime
-      })
-      response.end(data)
-    }
-  })
+function main(request, response, compiler) {
+    var urlInfo = parseURL(__dirname, request.url)
+    console.log('获取静态路径')
+    console.log(urlInfo)
+    combineFiles(urlInfo.pathnames, function (err, data) {
+        if (err) {
+            response.writeHead(404);
+            response.end(err.message);
+        } else {
+            response.writeHead(200, {
+                'Content-Type': urlInfo.mime
+            })
+            response.end(data)
+        }
+    }, compiler)
 }
 module.exports = main

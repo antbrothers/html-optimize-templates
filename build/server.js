@@ -14,7 +14,7 @@ app.use('/assets', express.static('src/assets'))
 
 // 把wepack-dev-middleware当做一个中间件使用
 // 把 webpack 处理后的文件,写入到内存中，并且传递给服务器(server)
-app.use(webpackDevMiddleware(compiler, {
+app.use(webpackDevMiddleware(compiler, {    
     publicPath: config.output.publicPath
 }))
 
@@ -71,7 +71,7 @@ app.use('/get', express.Router().get('/menu', function (req, res, next) {
 // 解析静态资源
 app.use('/', express.Router().get('/dinamic', function (req, res, next) { 
     console.log('进入')
-    analysis(req, res)
+    analysis(req, res, compiler)
 }))
 
 // 配置路由 解析 html
@@ -88,6 +88,7 @@ app.get('/:page?', function (req, res, next) {
         }
     }
     var filepath = path.join(compiler.outputPath, page);
+    console.log('读取路径')
     console.log(filepath);
 
     // 从内存中读取文件
