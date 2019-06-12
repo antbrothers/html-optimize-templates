@@ -69,8 +69,7 @@ app.use('/get', express.Router().get('/menu', function (req, res, next) {
     res.send({ compoents: _compoents, pages: _pages })
 }))
 // 解析静态资源
-app.use('/', express.Router().get('/dinamic', function (req, res, next) { 
-    console.log('进入')
+app.use('/', express.Router().get('/dinamic', function (req, res, next) {    
     analysis(req, res, compiler)
 }))
 
@@ -87,9 +86,7 @@ app.get('/:page?', function (req, res, next) {
             page = req.params.page ? req.params.page + '.html' : 'contentpage.html'
         }
     }
-    var filepath = path.join(compiler.outputPath, page);
-    console.log('读取路径')
-    console.log(filepath);
+    var filepath = path.join(compiler.outputPath, page);   
 
     // 从内存中读取文件
     compiler.outputFileSystem.readFile(filepath, function (err, result) {

@@ -41,7 +41,7 @@ const htmlConfig = () => {
         if (attr.indexOf('preview') === -1) { // 首页 和导航页面
             config.push(
                 new HtmlWebpackPlugin({
-                    title: '收钱吧',
+                    title: 'XXX',
                     filename: `./${attr}.html`,
                     template: HtmlTpl[attr],
                     chunks: ['flexble', 'lib', 'runtime', 'common', 'app'], // 选择要打包js 入口文件
@@ -55,8 +55,7 @@ const htmlConfig = () => {
                         collapseWhitespace: true, // 删除空格
                         preserveLineBreaks: false // 删除换行
                     },
-                    injectCriticalCss(htmlWebpackPluginStats, compilation) {
-                        console.log(htmlWebpackPluginStats.files.chunks)
+                    injectCriticalCss(htmlWebpackPluginStats, compilation) {                        
                         return lodash(htmlWebpackPluginStats.files.chunks)
                             .map(chunk => chunk.css)
                             .flatten()
@@ -81,11 +80,32 @@ const htmlConfig = () => {
         } else if (attr.indexOf('preview') > -1) { // 模块预览
             config.push(
                 new HtmlWebpackPlugin({
+                    title: '预览',
                     filename: `./${attr}.html`,
                     template: HtmlTpl[attr],
-                    chunks: ['common', HtmlTpl[attr].split('/')[3]], // 预览模块js独立打包
+                    chunks: ['flexble','lib', 'runtime','common', HtmlTpl[attr].split('/')[3]], // 预览模块js独立打包
                     chunksSortMode: 'manual',
-                    inject: true
+                    inject: false,
+                    injectCriticalCss(htmlWebpackPluginStats, compilation) {                        
+                        return lodash(htmlWebpackPluginStats.files.chunks)
+                            .map(chunk => chunk.css)
+                            .flatten()
+                            .filter(cssFilename => /^css\b/.test(cssFilename))
+                            .map(cssFilename => `<style>${
+                                compilation.assets[cssFilename].source()
+                                }</style>`)
+                            .join('\n');
+                    },
+                    injectNonCriticalCss(htmlWebpackPluginStats) {
+                        var p = []
+                         lodash(htmlWebpackPluginStats.files.chunks)
+                            .map(chunk => chunk.entry)
+                            .flatten()
+                            .filter(jsFilename => /^js\b/.test(jsFilename))   
+                            .map(jsFilename => p.push(jsFilename))
+                            .join('\n');
+                        return `<script type="text/javascript" src="/dinamic/??${p.join(',')}"></script>`
+                    },
                 })
             )
         } else {

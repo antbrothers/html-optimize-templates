@@ -3,7 +3,7 @@
  * @Desc: 解析静态资源路径
  * @Date: 2019-06-10 11:35:04 
  * @Last Modified by: linjianx
- * @Last Modified time: 2019-06-12 11:13:56
+ * @Last Modified time: 2019-06-12 11:24:58
  */
 const fs = require("fs")
 const path = require('path')
@@ -44,9 +44,7 @@ function combineFiles(pathnames, callback, compiler) {
             }
 
         } else {
-            const data = Buffer.concat(output);
-            console.log(data);
-
+            const data = Buffer.concat(output);          
             callback(null, data);
         }
     }(0, pathnames.length));
@@ -76,9 +74,7 @@ function parseURL(root, url) {
 }
 
 function main(request, response, compiler) {
-    var urlInfo = parseURL(__dirname, request.url)
-    console.log('获取静态路径')
-    console.log(urlInfo)
+    var urlInfo = parseURL(__dirname, request.url)    
     combineFiles(urlInfo.pathnames, function (err, data) {
         if (err) {
             response.writeHead(404);
